@@ -1,0 +1,16 @@
+# Financial data — never upload to GitHub
+input/
+output/
+reference/
+.tmp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Environment
+.env
+
+# Streamlit
+.streamlit/secrets.toml
