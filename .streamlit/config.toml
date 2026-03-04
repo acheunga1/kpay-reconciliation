@@ -2,5 +2,5 @@
 gatherUsageStats = false
 
 [server]
-headless = false
+headless = true
 port = 8501
