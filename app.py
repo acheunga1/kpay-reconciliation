@@ -16,7 +16,7 @@ from openpyxl import Workbook
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "tools"))
 from reconcile_kpay import (
     read_pos, read_kpay, read_dbs,
-    build_sheet, validate_output,
+    build_sheet, validate_output, determine_methods,
 )
 
 # ── Helper ────────────────────────────────────────────────────────────────────
@@ -119,14 +119,18 @@ if st.button("Generate Reconciliation Report", type="primary", disabled=not all_
 
                 # 2. KPay
                 st.write("Reading KPay transactions…")
-                kpay_data, settle_dates = read_kpay(kpay_path)
+                kpay_data, settle_dates, methods_found = read_kpay(kpay_path)
+                methods, rare_methods = determine_methods(methods_found)
                 total_gross = sum(
                     v["gross"]
                     for d in kpay_data.values()
                     for v in d.values()
                 )
                 st.write(f"  → {len(settle_dates)} settle dates, "
+                         f"{len(methods)} payment methods, "
                          f"gross total = HKD {total_gross:,.2f}")
+                if rare_methods:
+                    st.write(f"  → Rare methods (shown separately): {', '.join(rare_methods)}")
 
                 # 3. DBS
                 st.write("Reading DBS bank statement…")
@@ -140,7 +144,8 @@ if st.button("Generate Reconciliation Report", type="primary", disabled=not all_
                 wb = Workbook()
                 wb.remove(wb.active)
                 build_sheet(wb, pos_daily, kpay_data, settle_dates,
-                            dbs_by_date, store_code, year, month)
+                            dbs_by_date, store_code, year, month,
+                            methods, rare_methods)
                 wb.save(out_path)
 
                 # 5. Validate
