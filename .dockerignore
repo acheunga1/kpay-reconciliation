@@ -1,0 +1,11 @@
+assets/
+output/
+.tmp/
+__pycache__/
+*.pyc
+.DS_Store
+desktop.ini
+.env
+credentials.json
+token.json
+*.code-workspace
